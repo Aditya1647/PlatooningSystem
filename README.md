@@ -1,129 +1,158 @@
-# Efficient Platooning with CARLA Simulator
+# Enhanced Platooning for Energy Efficiency and Safety
 
-Group - 39
-Yugam Bhatt
-Vaibhav Gupta
-Aditya Gupta
-Shashwat Saini
-Nitin Kumar
+## Overview
+Platooning is an innovative approach to vehicle management that leverages cooperative automation to enhance **energy efficiency** and **safety**. This project focuses on developing an advanced platooning system using real-time communication, simulation, and sensor-based decision-making.
 
-Welcome to the Efficient Platooning project! This README will guide you through the process of setting up the CARLA simulator, the Python environment, and associated tools for the project.
-
----
-
-## Prerequisites
-
-- A computer with **Windows** or **Ubuntu** (Ubuntu is recommended for stability).
-- A graphics card for smoother simulation performance (optional but helpful).
+### Key Features
+- **Need for Platooning:** Addresses critical challenges in energy consumption and road safety.
+- **Simulation with CARLA:** Testing and validating platooning performance under varied traffic and environmental conditions.
+- **Bluetooth-Controlled Lead Vehicle:** The front car is controlled via Bluetooth for baseline behavior coordination.
+- **ESP-to-ESP Communication:** Rear vehicles communicate using ESP-NOW for efficient operation.
+- **Real-Time Sensor Data Analysis:** IMU and Ultrasonic sensors ensure optimal decision-making and adaptability.
 
 ---
 
-## Step 1: Installing CARLA Simulator
+## Video Demo
+[![Watch the video](https://img.youtube.com/vi/emA3QzaC8Kk/0.jpg)](https://www.youtube.com/watch?v=emA3QzaC8Kk)
 
-1. **Download the Simulator**:
-   - Visit [CARLA Downloads](https://tiny.carla.org/carla-0-9-15-windows).
-   - Download the latest release for your operating system.
-   - Optionally, download additional maps.
-
-2. **Extract the Files**:
-   - Place the downloaded ZIP file in a directory (e.g., `C:\CARLA` for Windows).
-   - Extract the ZIP file. After extraction, the main directory should contain the simulator files.
-
-3. **Run the Simulator**:
-   - Navigate to the extracted directory.
-   - Launch the simulator by running the executable (`CarlaUE4.exe` on Windows).
-   - Use **WASD** keys to navigate in the simulator and hold the left mouse button to adjust the camera view.
+Click on the image above to watch the demo of our **Enhanced Platooning System** in action!
 
 ---
 
-## Step 2: Setting Up Python Environment
+## Motivation
+### 1. Increasing Demand for Energy Efficiency
+- Reduces **fuel consumption** and **CO₂ emissions**.
+- Helps **fleet operators** lower operational costs.
 
-### 1. Install Anaconda
+### 2. Enhancing Road Safety
+- **Real-Time Communication** prevents collisions.
+- **Predictive Hazard Detection** with Ultrasonic and IMUs.
+- **Minimized Human Dependency** improves reliability.
 
-- Download and install [Anaconda](https://www.anaconda.com/).
-- Follow installation instructions available on YouTube.
+### 3. Technological Advancements
+- **Sensor Fusion** for accurate environmental perception.
+- **Machine Learning & AI** for real-time dynamic platooning.
 
-### 2. Create a Virtual Environment
+---
 
-1. Open **Anaconda Prompt**.
-2. Navigate to the CARLA Python API folder:
-   ```bash
-   cd C:\CARLA\PythonAPI
-   cd examples
-Create a virtual environment with Python 3.7.16:
+## System Model and Workflow
+### Lead Vehicle (Master)
+#### Hardware Components
+- **Microcontroller:** ESP32
+- **Sensors:** IMU, Ultrasonic sensor
+- **Actuation:** 4-motor drivetrain with motor controller
+- **Communication:**
+  - Bluetooth (remote control)
+  - ESP-NOW (vehicle-to-vehicle communication)
 
-bash
+#### Control Mechanism
+1. **Remote Control**: Controlled via an Android Bluetooth app.
+2. **Sensor Data Transmission**: Sends acceleration and orientation data to the follower.
 
-conda create -n carla-sim python=3.7.16
-Confirm the installation if prompted.
-Activate the environment:
+### Follower Vehicle (Slave)
+#### Control Logic
+1. **Data Reception and Processing:** Receives lead vehicle data.
+2. **Distance and Obstacle Management:** Uses an ultrasonic sensor.
+3. **Throttle and Steering Computation:** 
+   - **Deterministic Cruise Control** (Rule-based).
+   - **Machine Learning Model** (Not implemented on hardware due to ESP32 limitations).
 
-bash
+### Simulation Environment
+- **CARLA Simulator** for testing and validating platooning algorithms.
+- **Algorithms Tested:**
+  1. Cooperative Adaptive Cruise Control (CACC)
+  2. Linear Quadratic (LQ) Control
+  3. Machine Learning-based Control Strategies
+- **Communication Protocols:**
+  - **Bluetooth:** Remote control for lead vehicle.
+  - **ESP-NOW:** Low-latency inter-vehicle communication.
 
-conda activate carla-sim
-3. Install Required Libraries
-Install the following libraries one by one:
+---
 
-CARLA:
-bash
+## Results
+- **15% Reduction in Fuel Consumption** due to optimized inter-vehicle spacing.
+- **Improved Safety** via real-time sensor integration and predictive hazard detection.
+- **Cost-Efficient Solution** using ESP32 modules.
 
-pip install carla
-Pygame:
-bash
+### Drag Coefficient Analysis
+- Close spacing (1-5m) significantly reduces drag.
+- Beyond **15m spacing**, drag reduction plateaus.
+- Trucks benefit the most due to larger aerodynamic advantages.
 
-pip install pygame
-NumPy:
-bash
+### Simulation Insights
+- **Safe Spacing Increases with Speed:** 4.52m at 20 km/h to 8.41m at 50 km/h.
+- **Trailing Vehicles Benefit More** from drag reduction.
+- **Platoon Efficiency Stabilizes** at 15-20m but remains better than non-platooning.
 
-pip install numpy
-Jupyter:
-bash
+---
 
-pip install jupyter
-OpenCV:
-bash
+## Challenges and Solutions
+### 1. Obtaining x,y,z Coordinates and Yaw
+- **Issue:** Difficulty in obtaining accurate positional data.
+- **Solution:** Used IMU sensor differentiation and fine-tuned sensor alignment.
 
-pip install opencv-python
-4. Test the Environment
-Start the CARLA simulator.
-Navigate to the examples folder:
-bash
+### 2. Hardware Limitations Preventing ML Deployment
+- **Issue:** ESP32 lacks real-time ML computation capability.
+- **Solution:** Future work involves **lightweight ML models** using **TensorFlow Lite Micro**.
 
-cd C:\CARLA\PythonAPI\examples
-Run a sample script:
-bash
+### 3. High Computational Overhead from CARLA Simulation
+- **Issue:** Running the simulator and ML model simultaneously caused performance issues.
+- **Solution:** Pre-training using a **deterministic model** before full simulation.
 
-python generate_traffic.py
-Use Ctrl+C to stop the script and clean up the simulation.
-Step 3: Setting Up and Running the Deterministic Model
-Place the simple_follower.py script in the C:\CARLA\PythonAPI\examples folder.
-Start the simulator and run the script:
-bash
+---
 
-python simple_follower.py
-Step 4: Training the ML Model
-Open the ML_model_training.ipynb notebook:
-bash
+## Future Improvements
+1. **Deploy ML Model on ESP32**
+   - Use **quantization and pruning** to reduce model size.
+   - Explore **TensorFlow Lite Micro** for real-time ML deployment.
+2. **Dynamic Platooning Behavior**
+   - Adjust platoon configuration based on **real-time road conditions**.
+   - Expand to **multi-vehicle interactions**.
+3. **Advanced Sensors Integration**
+   - Incorporate **LiDAR & stereo cameras** for enhanced perception.
+   - Implement **V2X communication** for infrastructure interaction.
+4. **Enhanced Safety Features**
+   - Use **deep learning for predictive collision avoidance**.
+   - Develop robust **fail-safe mechanisms**.
 
-jupyter notebook ML_model_training.ipynb
-Train the machine learning model and save it as:
+---
 
-platooning_model.tflite
-Step 5: Running the ML Model in CARLA
-Place the ml_code.py script in the C:\CARLA\PythonAPI\examples folder.
-Start the simulator and run the script:
-bash
+## How to Set Up the Project
+### 1. Install CARLA Simulator
+1. Download from [CARLA Downloads](https://tiny.carla.org/carla-0-9-15-windows).
+2. Extract files and run `CarlaUE4.exe` (Windows) or `./CarlaUE4.sh` (Ubuntu).
 
-python ml_code.py
-Step 6: Setting Up ESP32 Master and Slave Devices
-1. Install Required Libraries
-Ensure the following libraries and settings are configured in Arduino IDE:
+### 2. Set Up Python Environment
+- Install Anaconda and create a virtual environment:
+  ```bash
+  conda create -n carla-sim python=3.7.16
+  conda activate carla-sim
+  ```
+- Install dependencies:
+  ```bash
+  pip install carla pygame numpy jupyter opencv-python
+  ```
 
-ESP32 Module for Arduino IDE
-Async HTTP Server
-Async Client
-Partition size set to Huge App
-2. Upload the Code
-Open master_code.ino and slave_code.ino in Arduino IDE.
-Connect ESP32 devices via USB.
-Upload master_code.ino to the Master ESP32 and slave_code.ino to the Slave ESP32.
+### 3. Running the Platooning Simulation
+- **Deterministic Model:**
+  ```bash
+  python simple_follower.py
+  ```
+- **ML Model Training:**
+  ```bash
+  jupyter notebook ML_model_training.ipynb
+  ```
+- **ML Model Execution in CARLA:**
+  ```bash
+  python ml_code.py
+  ```
+
+### 4. Setting Up ESP32 Communication
+- Install **ESP32 libraries** in Arduino IDE.
+- Upload `master_code.ino` to **Lead Vehicle ESP32**.
+- Upload `slave_code.ino` to **Follower Vehicle ESP32**.
+
+---
+
+## Conclusion
+This project successfully demonstrates **energy-efficient and safe platooning** using a combination of **simulation, sensor-based decision-making, and real-time communication**. Future work includes **real-time ML deployment**, **dynamic platooning behavior**, and **advanced sensor integration**.
