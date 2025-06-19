@@ -1,4 +1,4 @@
-# Enhanced Platooning for Energy Efficiency and Safety
+# Enhanced Platooning for Energy Efficiency and Safety 
 
 ## Overview
 Platooning is an innovative approach to vehicle management that leverages cooperative automation to enhance **energy efficiency** and **safety**. This project focuses on developing an advanced platooning system using real-time communication, simulation, and sensor-based decision-making.
