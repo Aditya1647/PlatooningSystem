@@ -156,3 +156,4 @@ Click on the image above to watch the demo of our **Enhanced Platooning System**
 
 ## Conclusion
 This project successfully demonstrates **energy-efficient and safe platooning** using a combination of **simulation, sensor-based decision-making, and real-time communication**. Future work includes **real-time ML deployment**, **dynamic platooning behavior**, and **advanced sensor integration**.
+
