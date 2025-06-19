@@ -22,7 +22,7 @@ Click on the image above to watch the demo of our **Enhanced Platooning System**
 ## Motivation
 ### 1. Increasing Demand for Energy Efficiency
 - Reduces **fuel consumption** and **CO₂ emissions**.
-- Helps **fleet operators** lower operational costs.
+- Helps **fleet operators** lower operational costs .
 
 ### 2. Enhancing Road Safety
 - **Real-Time Communication** prevents collisions.
