@@ -1,14 +1,15 @@
-# Enhanced Platooning for Energy Efficiency and Safety 
+# Enhanced Platooning for Energy Efficiency and Safety
 
 ## Overview
-Platooning is an innovative approach to vehicle management that leverages cooperative automation to enhance **energy efficiency** and **safety**. This project focuses on developing an advanced platooning system using real-time communication, simulation, and sensor-based decision-making.
+This project focuses on developing an advanced platooning system that uses machine learning to enhance energy efficiency and road safety. It combines real-time communication, a high-fidelity simulation environment (CARLA), and sensor-based decision-making to optimize vehicle coordination.
+
+For a detailed problem description, objectives, and requirements, please see the [PROBLEM_STATEMENT.md](PROBLEM_STATEMENT.md).
 
 ### Key Features
-- **Need for Platooning:** Addresses critical challenges in energy consumption and road safety.
-- **Simulation with CARLA:** Testing and validating platooning performance under varied traffic and environmental conditions.
-- **Bluetooth-Controlled Lead Vehicle:** The front car is controlled via Bluetooth for baseline behavior coordination.
-- **ESP-to-ESP Communication:** Rear vehicles communicate using ESP-NOW for efficient operation.
-- **Real-Time Sensor Data Analysis:** IMU and Ultrasonic sensors ensure optimal decision-making and adaptability.
+- **Energy Efficiency:** Reduces fuel consumption and CO₂ emissions by minimizing aerodynamic drag.
+- **Enhanced Safety:** Prevents collisions through real-time communication and predictive hazard detection.
+- **Simulation and Hardware:** Validated in the CARLA simulator and implemented on ESP32-based hardware.
+- **Multiple Control Strategies:** Implements both a deterministic (rule-based) and an ML-based control model.
 
 ---
 
@@ -16,6 +17,93 @@ Platooning is an innovative approach to vehicle management that leverages cooper
 [![Watch the video](https://img.youtube.com/vi/emA3QzaC8Kk/0.jpg)](https://www.youtube.com/watch?v=emA3QzaC8Kk)
 
 Click on the image above to watch the demo of our **Enhanced Platooning System** in action!
+
+---
+
+## File Structure
+```
+.
+├── images
+│   ├── motor_connection.jpg
+│   └── sensor_connection.jpg
+├── model
+│   ├── ML_model_training.ipynb
+│   └── platooning_model.tflite
+├── src
+│   ├── arduino
+│   │   ├── master_code.ino
+│   │   └── slave_code.ino
+│   └── python
+│       ├── ml_code.py
+│       └── simple_follower.py
+├── PROBLEM_STATEMENT.md
+└── README.md
+```
+
+## File Descriptions
+
+### `src/`
+This directory contains the source code for the project.
+
+- **`arduino/`**: Contains the Arduino sketches for the ESP32 microcontrollers.
+    - **`master_code.ino`**: The code for the lead vehicle (master). It reads sensor data and sends it to the follower vehicle.
+    - **`slave_code.ino`**: The code for the follower vehicle (slave). It receives data from the master and controls the vehicle's movement.
+
+- **`python/`**: Contains the Python scripts for the CARLA simulation.
+    - **`simple_follower.py`**: A simple implementation of a follower vehicle using a deterministic model.
+    - **`ml_code.py`**: The code for running the machine learning model in the CARLA simulation.
+
+### `model/`
+This directory contains the machine learning model and the training notebook.
+
+- **`ML_model_training.ipynb`**: A Jupyter notebook that trains the platooning model.
+- **`platooning_model.tflite`**: The trained TensorFlow Lite model for platooning.
+
+### `images/`
+This directory contains images related to the hardware setup.
+
+- **`motor_connection.jpg`**: A diagram showing the motor connections.
+- **`sensor_connection.jpg`**: A diagram showing the sensor connections.
+
+---
+
+## System Architecture
+
+### 1. Hardware Implementation (ESP32)
+
+The physical implementation consists of two vehicles: a lead vehicle (master) and a follower vehicle (slave).
+
+#### Lead Vehicle (Master)
+- **Microcontroller:** ESP32
+- **Control:** Manually operated via a Bluetooth serial app.
+- **Communication:** Sets up a Wi-Fi access point and broadcasts its sensor data via an HTTP server.
+- **Sensors:** An MPU-6050 IMU measures acceleration and angular velocity.
+- **Code:** `src/arduino/master_code.ino`
+
+#### Follower Vehicle (Slave)
+- **Microcontroller:** ESP32
+- **Control Logic:** A proportional controller adjusts speed and steering to follow the leader.
+- **Communication:** Connects to the master's Wi-Fi network to receive IMU data.
+- **Sensors:**
+    - An MPU-6050 IMU measures its own orientation.
+    - An ultrasonic sensor measures the distance to the lead vehicle.
+- **Code:** `src/arduino/slave_code.ino`
+
+### 2. Simulation (CARLA)
+
+The platooning algorithms are tested and validated in the CARLA simulator.
+
+#### Deterministic Follower
+- **Description:** A simple rule-based follower using a Proportional-Derivative (PD) controller for longitudinal control (throttle/brake) and a Proportional (P) controller for lateral control (steering).
+- **Goal:** Maintain a fixed distance from the leader while matching its trajectory.
+- **Script:** `src/python/simple_follower.py`
+
+#### Machine Learning Follower
+- **Description:** Uses a trained TensorFlow Lite model to predict vehicle controls.
+- **Model:** The model (`model/platooning_model.tflite`) takes sensor data as input and outputs throttle, brake, and steer values.
+- **Inputs:** Lead/follower speed, lead/follower yaw, current distance, target distance, and speed error.
+- **Script:** `src/python/ml_code.py`
+- **Training:** The model is trained in the `model/ML_model_training.ipynb` notebook.
 
 ---
 
@@ -118,6 +206,7 @@ Click on the image above to watch the demo of our **Enhanced Platooning System**
 ---
 
 ## How to Set Up the Project
+
 ### 1. Install CARLA Simulator
 1. Download from [CARLA Downloads](https://tiny.carla.org/carla-0-9-15-windows).
 2. Extract files and run `CarlaUE4.exe` (Windows) or `./CarlaUE4.sh` (Ubuntu).
@@ -130,30 +219,29 @@ Click on the image above to watch the demo of our **Enhanced Platooning System**
   ```
 - Install dependencies:
   ```bash
-  pip install carla pygame numpy jupyter opencv-python
+  pip install carla pygame numpy jupyter opencv-python tflite-runtime
   ```
 
 ### 3. Running the Platooning Simulation
 - **Deterministic Model:**
   ```bash
-  python simple_follower.py
+  python src/python/simple_follower.py
   ```
 - **ML Model Training:**
   ```bash
-  jupyter notebook ML_model_training.ipynb
+  jupyter notebook model/ML_model_training.ipynb
   ```
 - **ML Model Execution in CARLA:**
   ```bash
-  python ml_code.py
+  python src/python/ml_code.py
   ```
 
 ### 4. Setting Up ESP32 Communication
-- Install **ESP32 libraries** in Arduino IDE.
-- Upload `master_code.ino` to **Lead Vehicle ESP32**.
-- Upload `slave_code.ino` to **Follower Vehicle ESP32**.
+- Install **ESP32 libraries** in Arduino IDE (including `Adafruit_MPU6050`, `ESPAsyncWebServer`, and `ArduinoJson`).
+- Upload `src/arduino/master_code.ino` to **Lead Vehicle ESP32**.
+- Upload `src/arduino/slave_code.ino` to **Follower Vehicle ESP32**.
 
 ---
 
 ## Conclusion
-This project successfully demonstrates **energy-efficient and safe platooning** using a combination of **simulation, sensor-based decision-making, and real-time communication**. Future work includes **real-time ML deployment**, **dynamic platooning behavior**, and **advanced sensor integration**.
-
+This project successfully demonstrates **energy-efficient and safe platooning** using a combination of **simulation, sensor-based decision-making, and real-time communication**. Future work includes **real-time ML deployment**, **dynamic platooning behavior**, and **advanced sensor integration**. 
